@@ -1,5 +1,5 @@
 /*For more information see notes.txt in the Documentation folder */
-#include <gplib.h>   
+#include <gplib.h>
 #include <string.h>
 
 #define _PPScriptMode_		// for enum mode, replace this with #define _EnumMode_
@@ -30,7 +30,7 @@ int init_buffer(char *types, void *ptr_arr[]) {
     // That is necessary if using interleaved blocks - buffer size is also necessary in that case:
     // last_ocuppied_memory += buffer_size instead - it'd be better to find a better name for last_ocuppied_memory
     // Probably it needs a flag whether the blocks are interleaved or not - or use it when arg[0] exists
-        
+
     // Initialize buffer on USHM
     size_t block_len = 0;
     int idx; // loop iterator
@@ -52,7 +52,7 @@ int init_buffer(char *types, void *ptr_arr[]) {
                 ptr_arr[idx] = (int *)pushm + ((uintptr_t)last_ocuppied_memory >> 2);
                 last_ocuppied_memory += sizeof(int);
                 break;
-     
+
             case 'd':
                 if (is_aligned(last_ocuppied_memory,sizeof(double))) {
                     //Round up to the next alligned 8 bytes
@@ -65,7 +65,7 @@ int init_buffer(char *types, void *ptr_arr[]) {
 
             default:
                 return -1;
-        }        
+        }
     }
     return 0;
 }
@@ -77,7 +77,7 @@ int main(void)
     // They could be arranged subsequently or interleaved(not yet supported)
     // Each block can contain MAX_BLOCK_SIZE values - Currently supports: int and double
     char *block_types = "iiiddd";
-    
+
     // TODO: Make it into arg[] or calculate from block_types
     // Necessary for offset between blocks - for initializing and setting values
     size_t block_bytesize = 5*sizeof(double); // 5 bytes
@@ -98,7 +98,7 @@ int main(void)
             case 'd':
                 printf("Value at ptr_arr[%d]: %f\n", idx, *(double *)ptr_arr[idx]);
                 printf("Addr at ptr_arr[%d]: 0x%08x\n", idx, ptr_arr[idx]);
-                
+
                 break;
             // Extend to other types if needed
             default:
