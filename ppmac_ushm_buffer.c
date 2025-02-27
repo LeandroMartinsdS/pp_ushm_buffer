@@ -4,7 +4,7 @@
 
 #define _PPScriptMode_		// for enum mode, replace this with #define _EnumMode_
 #include "../../Include/pp_proj.h"
-#include "ppmac_ushm_buffer.h"
+#include "pp_ushm_buffer.h"
 
 //size_t get_block_size(char *types) {
 
