@@ -38,10 +38,8 @@ int init_buffer(char *types, void *ptr_arr[]) {
     // TODO: add optional arg to get offset
 
     // As it is, it is equivalent to what will be if receiving 1 as argument for offset // TODO: Review this statement
-    // That is necessary if using interleaved blocks - buffer size is also necessary in that case:
-    // last_ocuppied_memory += buffer_size instead - it'd be better to find a better name for last_ocuppied_memory
-    // Probably it needs a flag whether the blocks are interleaved or not - or use it when arg[0] exists
-
+    // That is necessary if using interleaved frames - buffer size is also necessary in that case:
+    // Probably it needs a flag whether the frames are interleaved or not - or use it when arg[0] exists
 
     // Initialize buffer on USHM
     size_t frame_len = 0;
@@ -68,6 +66,26 @@ int init_buffer(char *types, void *ptr_arr[]) {
     return 0;
 }
 
+inline void test_print_buffer(char *frame_types, void *ptr_arr[]) {
+    for (idx = 0; idx < get_frame_len(frame_types); idx++) {
+        switch (frame_types[idx]) {
+            case 'i':
+                printf("Value at ptr_arr[%d]: %d\n", idx, *(int *)ptr_arr[idx]);
+                printf("Addr at ptr_arr[%d]: 0x%08x\n", idx, ptr_arr[idx]);
+                break;
+            case 'd':
+                printf("Value at ptr_arr[%d]: %f\n", idx, *(double *)ptr_arr[idx]);
+                printf("Addr at ptr_arr[%d]: 0x%08x\n", idx, ptr_arr[idx]);
+
+                break;
+            // Extend to other types if needed
+            default:
+                printf("Unknown type at ptr_arr[%d]\n", idx);
+        }
+    }
+    return;
+}
+
 int main(void)
 {
     // TODO: Make it into arg[] - Test with different settings
@@ -87,24 +105,9 @@ int main(void)
     int idx;
 
     // TEST: Print the values stored at the addresses
-    for (idx = 0; idx < get_frame_len(frame_types); idx++) {
-        switch (frame_types[idx]) {
-            case 'i':
-                printf("Value at ptr_arr[%d]: %d\n", idx, *(int *)ptr_arr[idx]);
-                printf("Addr at ptr_arr[%d]: 0x%08x\n", idx, ptr_arr[idx]);
-                break;
-            case 'd':
-                printf("Value at ptr_arr[%d]: %f\n", idx, *(double *)ptr_arr[idx]);
-                printf("Addr at ptr_arr[%d]: 0x%08x\n", idx, ptr_arr[idx]);
+    test_print_buffer(frame_types, ptr_arr);
 
-                break;
-            // Extend to other types if needed
-            default:
-                printf("Unknown type at ptr_arr[%d]\n", idx);
-        }
-    }
-
-	CloseLibrary();
+    CloseLibrary();
 	return 0;
 }
 
