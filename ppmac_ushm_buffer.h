@@ -1,5 +1,8 @@
 // Buffer definitions
 
+#ifndef __USHM_BUFFER_H__
+#define __USHM_BUFFER_H__
+
 ////////////////////////////////////////////////////////////////////////////////////////
 // Base Address
 #define USHM_BASE_ADDR    4000
@@ -32,5 +35,7 @@
 #define USHM_BUFF_OFFSET_ADDR            (int)((USHM_BUFF_SIZE)*USHM_LINE_OFFSET_ADDR)
 #define USHM_BUFF_OFFSET_INT_IDX         (int)(USHM_BUFF_OFFSET_ADDR/sizeof(int))
 #define USHM_BUFF_OFFSET_DOUBLE_IDX      (int)(USHM_BUFF_OFFSET_ADDR/sizeof(double))
+
+#endif // __USHM_BUFFER_H__
 
 ////////////////////////////////////////////////////////////////////////////////////////
