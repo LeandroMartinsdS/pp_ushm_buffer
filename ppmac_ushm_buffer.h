@@ -1,41 +1,38 @@
 // Buffer definitions
 
-#ifndef __USHM_BUFFER_H__
-#define __USHM_BUFFER_H__
+#ifndef USHM_BUFFER_H
+#define USHM_BUFFER_H
 
 ////////////////////////////////////////////////////////////////////////////////////////
-// Base Address
-#define USHM_BASE_ADDR    4000
+// Constants
+#define INT_SHIFT       2   // sizeof(int) == 2^2
+#define DOUBLE_SHIFT    3   // sizeof(double) == 2^3
+////////////////////////////////////////////////////////////////////////////////////////
+// User defined
+#define USHM_BASE_ADDR    4000  // Base Address
 #define USHM_BUFF_SIZE    1000
-//#define _PVT_MODE_
-#define _RT_MODE_           // _PVT_MODE_ or _RT_MODE_
-////////////////////////////////////////////////////////////////////////////////////////
+#define MAX_FRAME_NUMEL   20
+
+// Mode
+// PVT_MODE or RT_MODE
+//#define PVT_MODE
+//#define RT_MODE
+// FRAMES_INTERLEAVED or FRAMES_SEQUENTIAL
+//#define FRAMES_INTERLEAVED
+//#define FRAMES_SEQUENTIAL
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
-#define MAX_FRAME_SIZE 20
+////////////////////////////////////////////////////////////////////////////////////////
+size_t get_frame_len(char *types);
+bool is_aligned(void* addr, size_t alignment);
+void* align_addr(void *addr, size_t alignment);
+void set_aligned_pointer(void **ptr_arr, int idx, void **next_free_memory, size_t size, unsigned int shift);
+int init_buffer(char *types, void *ptr_arr[], size_t *frame_bytesize);
+// void write_frame(char *types, void *ptr_arr[], void value);
+void test_print_buffer(char *frame_types, void *ptr_arr[]);
 
-#define INT_SHIFT       2
-#define DOUBLE_SHIFT    3
 
-#ifdef _RT_MODE_
-    #define DOUBLE_PER_POINT        NUM_AXES
-#elif _PVT_MODE_
-    #define DOUBLE_PER_POINT        2*NUM_AXES
-#endif
-
-// TODO: Refactor above to use bitshift instead of multiplication/division
-// Is this valid for both modes: _RT_MODE_ and _PVT_MODE_
-// Offset between points
-#define USHM_POINT_OFFSET_ADDR            (int)(2*sizeof(int)+DOUBLE_PER_POINT*sizeof(double))
-#define USHM_POINT_OFFSET_INT_IDX         (int)(USHM_LINE_OFFSET_ADDR/sizeof(int))
-#define USHM_POINT_OFFSET_DOUBLE_IDX      (int)(USHM_LINE_OFFSET_ADDR/sizeof(double))
-
-// Offset between buffers
-#define USHM_BUFF_OFFSET_ADDR            (int)((USHM_BUFF_SIZE)*USHM_LINE_OFFSET_ADDR)
-#define USHM_BUFF_OFFSET_INT_IDX         (int)(USHM_BUFF_OFFSET_ADDR/sizeof(int))
-#define USHM_BUFF_OFFSET_DOUBLE_IDX      (int)(USHM_BUFF_OFFSET_ADDR/sizeof(double))
-
-#endif // __USHM_BUFFER_H__
+#endif // USHM_BUFFER_H
 
 ////////////////////////////////////////////////////////////////////////////////////////
