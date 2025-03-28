@@ -11,7 +11,7 @@
 // User defined
 #define USHM_BASE_ADDR    4000  // Base Address
 #define USHM_BUFF_SIZE    1000
-#define MAX_FRAME_NUMEL   20
+#define MAX_FRAME_NUMEL   8
 
 // Mode
 // PVT_MODE or RT_MODE
@@ -24,13 +24,18 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////////////
+typedef union {
+    double d;
+    int i;
+} point;
+
 size_t get_frame_len(char *types);
 bool is_aligned(void* addr, size_t alignment);
 void* align_addr(void *addr, size_t alignment);
-void set_aligned_pointer(void **ptr_arr, int idx, void **next_free_memory, size_t size, unsigned int shift);
-int init_buffer(char *types, void *ptr_arr[], size_t *frame_bytesize);
+void set_aligned_pointer(point **ptr_arr, int idx, void **next_free_memory, size_t size, unsigned int shift);
+int init_buffer(char *types, point *ptr_arr[], size_t *frame_bytesize);
 // void write_frame(char *types, void *ptr_arr[], void value);
-void test_print_buffer(char *frame_types, void *ptr_arr[]);
+void test_print_buffer(char *frame_types, point *ptr_arr[]);
 
 
 #endif // USHM_BUFFER_H
