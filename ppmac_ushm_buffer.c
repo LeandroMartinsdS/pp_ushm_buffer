@@ -1,4 +1,4 @@
-//#define DEBUG
+#define DEBUG
 
 #ifndef DEBUG
     #include <gplib.h>
@@ -15,6 +15,10 @@
 #endif
 
 #include "ppmac_ushm_buffer.h"
+
+#ifdef DEBUG
+    void *pushm = NULL;
+#endif
 
 size_t get_frame_len(char *types) {
     return strlen(types);
@@ -34,9 +38,6 @@ void set_aligned_pointer(Point *ptr_arr[], int idx, void **next_free_memory, siz
     if (!is_aligned(*next_free_memory, size)) {
         *next_free_memory = align_addr(*next_free_memory, size);
     }
-    #ifdef DEBUG
-    void *pushm = (void *)malloc(sizeof(void));
-    #endif
     ptr_arr[idx] = (Point*)((uintptr_t)pushm + (uintptr_t)*next_free_memory);
     //printf("ptr_arr[%d]: 0x%08x\n", idx, (uintptr_t)ptr_arr[idx]);
     *next_free_memory += size;
@@ -53,9 +54,6 @@ int init_buffer(char *types, Point *ptr_arr[], size_t *frame_bytesize) {
     // Initialize buffer on USHM
     size_t frame_len = 0;
     unsigned int idx; // loop iterator
-    #ifdef DEBUG
-    void *pushm = (void *)malloc(sizeof(void));
-    #endif
     void* base_memory = USHM_BASE_ADDR;
     void* next_free_memory = base_memory;
     frame_len = get_frame_len(types);
@@ -68,7 +66,7 @@ int init_buffer(char *types, Point *ptr_arr[], size_t *frame_bytesize) {
             case 'd':
                 set_aligned_pointer(ptr_arr, idx, &next_free_memory, sizeof(double));
                 break;
-                case 'i':
+            case 'i':
                 set_aligned_pointer(ptr_arr, idx, &next_free_memory, sizeof(int));
                 break;
             default:
@@ -79,17 +77,85 @@ int init_buffer(char *types, Point *ptr_arr[], size_t *frame_bytesize) {
     return 0;
 }
 
+void update_addr(Point *ptr_arr[], int idx, size_t size) {
+    ptr_arr[idx] = (Point *)((uintptr_t)ptr_arr[idx] + size);
+    return;
+}
 
-void test_print_buffer(char *frame_types, Point *ptr_arr[]) {
+int update_buffer(char *types, Point *ptr_arr[], size_t size) {
+    unsigned int idx; // loop iterator
+    size_t frame_len = get_frame_len(types);
+    if (frame_len > MAX_FRAME_NUMEL) {
+        return -1;
+    }
+
+    for (idx = 0; idx < frame_len; idx++) {
+        update_addr(ptr_arr, idx, size);
+    }
+    return 0;
+}
+
+void write_double(Point *ptr_arr[], int idx , size_t size, double value) {
+    ptr_arr[idx]->d = value;
+    return;
+}
+
+void write_int(Point *ptr_arr[], int idx, size_t size, int value) {
+    ptr_arr[idx]->i = value;
+    return;
+}
+
+void write_frame(char *frame_types, Point *ptr_arr[], size_t size, Point values[]) {
     unsigned int idx;
     for (idx = 0; idx < get_frame_len(frame_types); idx++) {
         switch (frame_types[idx]) {
             case 'd':
-                ptr_arr[idx]->d = 12.6;
+//                write_double(ptr_arr, idx, size, values[idx]);
+                ptr_arr[idx]->d = values[idx].d;
+                break;
+            case 'i':
+//                write_int(ptr_arr, idx, size, value[idx]);
+                ptr_arr[idx]->i = values[idx].i;
+                break;
+            // Extend to other types if needed
+            default:
+                printf("Unknown type at ptr_arr[%d]\n", idx);
+        }
+    }
+    update_buffer(frame_types, ptr_arr, size);
+
+    return;
+}
+
+void test_write_buffer(char *frame_types, Point *ptr_arr[], size_t size) {
+    unsigned int idx;
+    for (idx = 0; idx < get_frame_len(frame_types); idx++) {
+        switch (frame_types[idx]) {
+            case 'd':
+                write_double(ptr_arr, idx, size, 12.7);
+                break;
+            case 'i':
+                write_int(ptr_arr, idx, size, 777);
+                break;
+            // Extend to other types if needed
+            default:
+                printf("Unknown type at ptr_arr[%d]\n", idx);
+        }
+    }
+    update_buffer(frame_types, ptr_arr, size);
+
+    return;
+}
+
+
+void test_print_buffer(char *frame_types, Point *ptr_arr[], size_t size) {
+    unsigned int idx;
+    for (idx = 0; idx < get_frame_len(frame_types); idx++) {
+        switch (frame_types[idx]) {
+            case 'd':
                 printf("*ptr_arr[%d]: %f\n", idx, *((double*)ptr_arr[idx]));
                 break;
             case 'i':
-                ptr_arr[idx]->i = 777;
                 printf("*ptr_arr[%d]: %d\n", idx, *((int*)ptr_arr[idx]));
 
                 break;
@@ -98,13 +164,15 @@ void test_print_buffer(char *frame_types, Point *ptr_arr[]) {
                 printf("Unknown type at ptr_arr[%d]\n", idx);
         }
     }
+    update_buffer(frame_types, ptr_arr, size);
+
     return;
 }
+
 
 int main(void)
 {
     Point *ptr_arr[MAX_FRAME_NUMEL];
-    unsigned int idx;    // Loop iterator
     // TODO: Make it into arg[] - Test with different settings
     // Usage example: for a scan each frame refers to a Point in the trajectory
     // They could be arranged subsequently or interleaved(not yet supported)
@@ -114,14 +182,34 @@ int main(void)
     size_t frame_bytesize = 0x00000000;
     //printf("%d\n",get_frame_len(frame_types));
 
-    #ifndef DEBUG
-        InitLibrary();  // Required for accessing Power PMAC library
+    #ifdef DEBUG
+    pushm = (void *)malloc(sizeof(pushm)); // HACK
+    #else
+    InitLibrary();  // Required for accessing Power PMAC library
     #endif
     init_buffer(frame_types, ptr_arr, &frame_bytesize); // TODO: return to status variable to check errors
     //printf("0x%08x\n",frame_bytesize);
     // TEST: Print the values stored at the addresses
-    test_print_buffer(frame_types, ptr_arr);
-	#ifndef DEBUG
+    Point *values = (Point *)malloc(4 * sizeof(Point));
+
+    values[0].i = 1;
+    values[1].i = 2;
+    values[2].d = 3.3;
+    values[3].d = 4.4;
+    write_frame(frame_types, ptr_arr, frame_bytesize, values);
+    values[0].i = 5;
+    values[1].i = 6;
+    values[2].d = 7.7;
+    values[3].d = 8.8;
+    write_frame(frame_types, ptr_arr, frame_bytesize, values);
+
+    init_buffer(frame_types, ptr_arr, &frame_bytesize);
+    test_print_buffer(frame_types, ptr_arr, frame_bytesize);
+    test_print_buffer(frame_types, ptr_arr, frame_bytesize);
+
+    #ifdef DEBUG
+        free(pushm);
+    #else
         CloseLibrary();
     #endif
     return 0;

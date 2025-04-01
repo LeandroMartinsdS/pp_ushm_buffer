@@ -34,9 +34,7 @@ bool is_aligned(void* addr, size_t alignment);
 void* align_addr(void *addr, size_t alignment);
 void set_aligned_pointer(Point *ptr_arr[], int idx, void **next_free_memory, size_t size);
 int init_buffer(char *types, Point *ptr_arr[], size_t *frame_bytesize);
-void set_double_value(Point *ptr_arr[], int idx, void **next_free_memory, size_t size);
-// void write_frame(char *types, void *ptr_arr[], void value);
-void test_print_buffer(char *frame_types, Point *ptr_arr[]);
+void test_print_buffer(char *frame_types, Point *ptr_arr[], size_t size);
 
 #endif // USHM_BUFFER_H
 
