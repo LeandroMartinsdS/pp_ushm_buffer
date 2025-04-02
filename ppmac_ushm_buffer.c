@@ -40,7 +40,7 @@ void set_aligned_pointer(Point *ptr_arr[], int idx, void **next_free_memory, siz
     }
     ptr_arr[idx] = (Point*)((uintptr_t)pushm + (uintptr_t)*next_free_memory);
     //printf("ptr_arr[%d]: 0x%08x\n", idx, (uintptr_t)ptr_arr[idx]);
-    *next_free_memory += size;
+    *next_free_memory = (char *)*next_free_memory + size;
     return;
 }
 
@@ -54,7 +54,7 @@ int init_buffer(char *types, Point *ptr_arr[], size_t *frame_bytesize) {
     // Initialize buffer on USHM
     size_t frame_len = 0;
     unsigned int idx; // loop iterator
-    void* base_memory = USHM_BASE_ADDR;
+    void* base_memory = (void *)(uintptr_t)USHM_BASE_ADDR;
     void* next_free_memory = base_memory;
     frame_len = get_frame_len(types);
     if (frame_len > MAX_FRAME_NUMEL) {
@@ -73,7 +73,7 @@ int init_buffer(char *types, Point *ptr_arr[], size_t *frame_bytesize) {
                 return -1;
         }
     }
-    *frame_bytesize = (size_t)(next_free_memory-base_memory);
+    *frame_bytesize = ((char *)next_free_memory-(char *)base_memory);
     return 0;
 }
 
@@ -184,6 +184,8 @@ int main(void)
 
     #ifdef DEBUG
     pushm = (void *)malloc(sizeof(pushm)); // HACK
+    // printf("sizeof(void): %zu\n", sizeof(char)); // Should fail in standard C
+
     #else
     InitLibrary();  // Required for accessing Power PMAC library
     #endif
