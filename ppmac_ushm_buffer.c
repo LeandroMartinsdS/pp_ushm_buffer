@@ -74,13 +74,6 @@ void* align_addr(void *addr, size_t alignment) {
     return (void *)((uint_addr + alignment-1) & ~(alignment -1));   // uint_addr + alignment - 1
 }
 
-
-
-void update_addr(Point *ptr_arr[], int idx, size_t size) {
-    ptr_arr[idx] = (Point *)((uintptr_t)ptr_arr[idx] + size);
-    return;
-}
-
 int update_buffer(char *types, Point *ptr_arr[], size_t size) {
     unsigned int idx; // loop iterator
     size_t frame_len = get_frame_len(types);
@@ -92,6 +85,11 @@ int update_buffer(char *types, Point *ptr_arr[], size_t size) {
         update_addr(ptr_arr, idx, size);
     }
     return 0;
+}
+
+void update_addr(Point *ptr_arr[], int idx, size_t size) {
+    ptr_arr[idx] = (Point *)((uintptr_t)ptr_arr[idx] + size);
+    return;
 }
 
 void write_double(Point *ptr_arr[], int idx , size_t size, double value) {
@@ -145,7 +143,6 @@ void test_write_buffer(char *frame_types, Point *ptr_arr[], size_t size) {
 
     return;
 }
-
 
 void test_print_buffer(char *frame_types, Point *ptr_arr[], size_t size) {
     unsigned int idx;
