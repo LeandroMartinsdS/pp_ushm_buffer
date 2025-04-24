@@ -181,7 +181,10 @@ int main(void)
     #ifdef DEBUG
     pushm = (void *)malloc(sizeof(pushm)); // HACK
     // printf("sizeof(void): %zu\n", sizeof(char)); // Should fail in standard C
+    #else
+    InitLibrary();
     #endif
+
     init_buffer(frame_types, ptr_arr, &frame_bytesize); // TODO: return to status variable to check errors
     //printf("0x%08x\n",frame_bytesize);
     // TEST: Print the values stored at the addresses
