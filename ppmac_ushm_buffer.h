@@ -24,14 +24,29 @@
 ////////////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////////////
+typedef union {
+    double d;
+    int i;
+} Point;
+
+
+int init_buffer(char *types, Point *ptr_arr[], size_t *frame_bytesize);
+
 size_t get_frame_len(char *types);
+
+void set_aligned_pointer(Point *ptr_arr[], int idx, void **next_free_memory, size_t size);
 bool is_aligned(void* addr, size_t alignment);
 void* align_addr(void *addr, size_t alignment);
-void set_aligned_pointer(void **ptr_arr, int idx, void **next_free_memory, size_t size, unsigned int shift);
-int init_buffer(char *types, void *ptr_arr[], size_t *frame_bytesize);
-// void write_frame(char *types, void *ptr_arr[], void value);
-void test_print_buffer(char *frame_types, void *ptr_arr[]);
 
+int update_buffer(char *types, Point *ptr_arr[], size_t size);
+void update_addr(Point *ptr_arr[], int idx, size_t size);
+
+void write_double(Point *ptr_arr[], int idx , size_t size, double value);
+void write_int(Point *ptr_arr[], int idx, size_t size, int value);
+void write_frame(char *types, Point *ptr_arr[], size_t size, Point values[]);
+
+void test_write_buffer(char *frame_types, Point *ptr_arr[], size_t size);
+void test_print_buffer(char *frame_types, Point *ptr_arr[], size_t size);
 
 #endif // USHM_BUFFER_H
 
