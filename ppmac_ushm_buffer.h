@@ -1,5 +1,7 @@
 // Buffer definitions
 
+#include <stdbool.h>
+
 #ifndef USHM_BUFFER_H
 #define USHM_BUFFER_H
 

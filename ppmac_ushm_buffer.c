@@ -166,50 +166,50 @@ void test_print_buffer(char *frame_types, Point *ptr_arr[], size_t size) {
 }
 
 
-int main(void)
-{
-    Point *ptr_arr[MAX_FRAME_NUMEL];
-    // TODO: Make it into arg[] - Test with different settings
-    // Usage example: for a scan each frame refers to a Point in the trajectory
-    // They could be arranged subsequently or interleaved(not yet supported)
-    // Each frame can contain MAX_FRAME_SIZE values - Currently supports: int and double
-    char *frame_types = "iidd";
+// int main(void)
+// {
+//     Point *ptr_arr[MAX_FRAME_NUMEL];
+//     // TODO: Make it into arg[] - Test with different settings
+//     // Usage example: for a scan each frame refers to a Point in the trajectory
+//     // They could be arranged subsequently or interleaved(not yet supported)
+//     // Each frame can contain MAX_FRAME_SIZE values - Currently supports: int and double
+//     char *frame_types = "iidd";
 
-    size_t frame_bytesize = 0x00000000;
-    //printf("%d\n",get_frame_len(frame_types));
+//     size_t frame_bytesize = 0x00000000;
+//     //printf("%d\n",get_frame_len(frame_types));
 
-    #ifdef DEBUG
-    pushm = (void *)malloc(sizeof(pushm)); // HACK
-    // printf("sizeof(void): %zu\n", sizeof(char)); // Should fail in standard C
-    #else
-    InitLibrary();
-    #endif
+//     #ifdef DEBUG
+//     pushm = (void *)malloc(sizeof(pushm)); // HACK
+//     // printf("sizeof(void): %zu\n", sizeof(char)); // Should fail in standard C
+//     #else
+//     InitLibrary();
+//     #endif
 
-    init_buffer(frame_types, ptr_arr, &frame_bytesize); // TODO: return to status variable to check errors
-    //printf("0x%08x\n",frame_bytesize);
-    // TEST: Print the values stored at the addresses
-    Point *values = (Point *)malloc(4 * sizeof(Point));
+//     init_buffer(frame_types, ptr_arr, &frame_bytesize); // TODO: return to status variable to check errors
+//     //printf("0x%08x\n",frame_bytesize);
+//     // TEST: Print the values stored at the addresses
+//     Point *values = (Point *)malloc(4 * sizeof(Point));
 
-    values[0].i = 7.78;
-    values[1].i = 2;
-    values[2].d = 3.3;
-    values[3].d = 4.4;
-    write_frame(frame_types, ptr_arr, frame_bytesize, values);
-    values[0].i = 5;
-    values[1].i = 6;
-    values[2].d = 7.7;
-    values[3].d = 8.8;
-    write_frame(frame_types, ptr_arr, frame_bytesize, values);
+//     values[0].i = 7.78;
+//     values[1].i = 2;
+//     values[2].d = 3.3;
+//     values[3].d = 4.4;
+//     write_frame(frame_types, ptr_arr, frame_bytesize, values);
+//     values[0].i = 5;
+//     values[1].i = 6;
+//     values[2].d = 7.7;
+//     values[3].d = 8.8;
+//     write_frame(frame_types, ptr_arr, frame_bytesize, values);
 
-    init_buffer(frame_types, ptr_arr, &frame_bytesize);
-    test_print_buffer(frame_types, ptr_arr, frame_bytesize);
-    test_print_buffer(frame_types, ptr_arr, frame_bytesize);
+//     init_buffer(frame_types, ptr_arr, &frame_bytesize);
+//     test_print_buffer(frame_types, ptr_arr, frame_bytesize);
+//     test_print_buffer(frame_types, ptr_arr, frame_bytesize);
 
-    #ifdef DEBUG
-        free(pushm);
-    #else
-        CloseLibrary();
-    #endif
-    return 0;
-}
+//     #ifdef DEBUG
+//         free(pushm);
+//     #else
+//         CloseLibrary();
+//     #endif
+//     return 0;
+// }
 
