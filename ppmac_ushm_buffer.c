@@ -20,15 +20,13 @@
     void *pushm = NULL;
 #endif
 
-int init_buffer(char *types, Point *ptr_arr[], size_t *frame_bytesize) {
+int init_buffer(char *types, Point *ptr_arr[], size_t *frame_bytesize, void* base_memory) {
     // TODO: add optional arg to get offset
     // Add option whether the frames are interleaved or not
 
     // Initialize buffer on USHM
     size_t frame_len = 0;
     unsigned int idx; // loop iterator
-    // void* base_memory = (void *)(uintptr_t)USHM_BASE_ADDR;
-    void* base_memory = (void *)USHM_BASE_ADDR;
     void* next_free_memory = base_memory;
     frame_len = get_frame_len(types);
     if (frame_len > MAX_FRAME_NUMEL) {
@@ -55,13 +53,13 @@ size_t get_frame_len(char *types) {
     return strlen(types);
 }
 
-void set_aligned_pointer(Point *ptr_arr[], int idx, void **next_free_memory, size_t size) {
-    if (!is_aligned(*next_free_memory, size)) {
-        *next_free_memory = align_addr(*next_free_memory, size);
+void set_aligned_pointer(Point *ptr_arr[], int idx, void **next_free_memory, size_t type_size) {
+    if (!is_aligned(*next_free_memory, type_size)) {
+        *next_free_memory = align_addr(*next_free_memory, type_size);
     }
     ptr_arr[idx] = (Point*)((uintptr_t)pushm + (uintptr_t)*next_free_memory);
     //printf("ptr_arr[%d]: 0x%08x\n", idx, (uintptr_t)ptr_arr[idx]);
-    *next_free_memory = (char *)*next_free_memory + size;
+    *next_free_memory = (char *)*next_free_memory + type_size;
     return;
 }
 
